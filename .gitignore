@@ -12,7 +12,8 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+.metadata
+pubspec.lock
 *.iml
 *.ipr
 *.iws
