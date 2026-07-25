@@ -4,7 +4,7 @@ class Tipografia {
 
   static TextStyle h1 = TextStyle(fontSize: 32,
   fontWeight: FontWeight.bold,
-  fontFamily: "inter",
+  fontFamily: "Inter",
   height: 1.3,
   letterSpacing: 32 * -0.02
 
@@ -12,14 +12,14 @@ class Tipografia {
 
   static TextStyle subtitulo = TextStyle(fontSize: 12,
   fontWeight: FontWeight.w500,
-  fontFamily: "inter",
+  fontFamily: "Inter",
   height: 1.4,
   letterSpacing: 12 * -0.01
   );
 
   static TextStyle link = TextStyle(fontSize: 12,
       fontWeight: FontWeight.w600,
-      fontFamily: "inter",
+      fontFamily: "Inter",
       height: 1.4,
       letterSpacing: 12 * -0.01,
       color: Colors.blue
