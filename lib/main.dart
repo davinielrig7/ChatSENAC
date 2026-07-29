@@ -47,26 +47,35 @@ class Login extends StatelessWidget {
           Text("Email"),
           const SizedBox(height: 4), // Tópico 3
           TextField(
+
             // Tópico 4: Estilização do input
             decoration: InputDecoration(
+
               hintText: "exemplo@gmail.com",
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+
+
             ),
+
           ),
+
           const SizedBox(height: 16), // Tópico 3
 
           // Campo de Senha
           Text("Senha"),
           const SizedBox(height: 4), // Tópico 3
           TextField(
+
             // Tópico 5: Oculta a senha
             obscureText: true,
             decoration: InputDecoration(
               hintText: "••••••••",
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              suffixIcon: Icon(Icons.visibility_off)
             ),
+
           ),
           const SizedBox(height: 12), // Tópico 3
 
