@@ -64,7 +64,7 @@ class Login extends StatelessWidget {
             obscureText: true,
             decoration: InputDecoration(
               hintText: "••••••••",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
           ),
@@ -88,7 +88,9 @@ class Login extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
-                shape: const StadiumBorder(),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0))
+                ),
                 elevation: 0,
               ),
               child: const Text("Entrar", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -103,12 +105,21 @@ class Login extends StatelessWidget {
           SizedBox(
             height: 48,
             child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                shape: const StadiumBorder(),
-                side: const BorderSide(color: Colors.grey),
-              ),
-              child: const Text("Continuar com o Google", style: TextStyle(color: Colors.black87)),
+                onPressed: () {},
+                style: OutlinedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0))
+                  ),
+                  side: const BorderSide(color: Colors.grey),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10,
+                  children: [
+                    Image.asset("assets/imagens/google-icon.png", height: 18,),
+                    Text("Continuar com o Google", style: Tipografia.subtitulo),
+                  ],
+                )
             ),
           ),
           const SizedBox(height: 12), // Tópico 3
@@ -117,12 +128,21 @@ class Login extends StatelessWidget {
           SizedBox(
             height: 48,
             child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                shape: const StadiumBorder(),
-                side: const BorderSide(color: Colors.grey),
-              ),
-              child: const Text("Continuar com o Facebook", style: TextStyle(color: Colors.black87)),
+                onPressed: () {},
+                style: OutlinedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0))
+                  ),
+                  side: const BorderSide(color: Colors.grey),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10,
+                  children: [
+                    Image.asset("assets/imagens/facebook-icon.png", height: 18,),
+                    Text("Continuar com o Facebook", style: Tipografia.subtitulo, textAlign: TextAlign.center,),
+                  ],
+                )
             ),
           ),
           const SizedBox(height: 54), // Tópico 3
