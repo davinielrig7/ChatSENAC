@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:primeiro_app/paginas/login.dart';
 import 'package:primeiro_app/utilitarios/tipografia.dart';
 
 class Cadastro extends StatelessWidget {
@@ -15,11 +14,10 @@ class Cadastro extends StatelessWidget {
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child: GestureDetector(onTap: () {
-                  Navigator.pop(
-                    context,
-                    MaterialPageRoute(builder: (context) => Login(),)
-                  );},
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
                   child: const Icon(
                     Icons.arrow_back,
                     size: 20,
@@ -44,7 +42,7 @@ class Cadastro extends StatelessWidget {
               TextField(
                 // Tópico 4: Estilização do input
                 decoration: InputDecoration(
-                  hintText: "Pablo Marcal",
+                  hintText: "exemplo@gmail.com",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
