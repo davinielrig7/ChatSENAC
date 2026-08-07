@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:primeiro_app/utilitarios/tipografia.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Cadastro extends StatelessWidget {
   const Cadastro({super.key});
