@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:primeiro_app/paginas/cadastro.dart';
 import 'package:primeiro_app/paginas/dashBoard.dart';
 import 'package:primeiro_app/utilitarios/tipografia.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -16,31 +17,41 @@ class _LoginState extends State<Login> {
   final emailControlador = TextEditingController();
   final senhaControlador = TextEditingController();
 
-
-
   Future<void> fazerLogin() async {
-    var url = Uri.http("10.112.4.33", "login");
+    var url = Uri.http("10.112.4.33", "api/login");
     var resposta = await http.post(
       url,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: jsonEncode({'email': emailControlador.text, 'senha': senhaControlador.text}),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'email': emailControlador.text,
+        'senha': senhaControlador.text,
+      }),
     );
 
     if (resposta.statusCode != 200) {
       var dados = jsonDecode(resposta.body);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${dados['message']}")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("${dados['message']}")));
 
       return;
     }
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (build) => Dashboard()),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (build) => Dashboard()));
+  }
+
+  bool isObscure = true;
+
+  void trocarVisibilidadeSenha() {
+    setState(() {
+      isObscure = !isObscure;
+    });
+  }
+
+  IconData iconeSenha() {
+    return isObscure
+        ? Icons.visibility_off
+        : Icons.visibility;
   }
 
   @override
@@ -61,18 +72,22 @@ class _LoginState extends State<Login> {
                   Text("ChatSENAC"),
                 ],
               ),
-              const SizedBox(height: 32), // Tópico 3
+              const SizedBox(height: 32),
+              // Tópico 3
               // Títulos
               Text("Entre na sua conta", style: Tipografia.h1),
-              const SizedBox(height: 12), // Tópico 3
+              const SizedBox(height: 12),
+              // Tópico 3
               Text(
                 "Coloque o seu email e senha para logar",
                 style: Tipografia.subtitulo,
               ),
-              const SizedBox(height: 32), // Tópico 3
+              const SizedBox(height: 32),
+              // Tópico 3
               // Campo de Email
               Text("Email"),
-              const SizedBox(height: 4), // Tópico 3
+              const SizedBox(height: 4),
+              // Tópico 3
               TextField(
                 controller: emailControlador,
                 // Tópico 4: Estilização do input
@@ -87,28 +102,31 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16), // Tópico 3
+              const SizedBox(height: 16),
+              // Tópico 3
               // Campo de Senha
               Text("Senha"),
-              const SizedBox(height: 4), // Tópico 3
+              const SizedBox(height: 4),
               TextField(
                 controller: senhaControlador,
-                // Tópico 5: Oculta a senha
-                obscureText: true,
+                obscureText: isObscure,
                 decoration: InputDecoration(
                   hintText: "••••••••",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  suffixIcon: Icon(Icons.visibility_off),
+                  suffixIcon: IconButton(
+                    onPressed: trocarVisibilidadeSenha,
+                    icon: Icon(iconeSenha()),
+                  ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
                 ),
               ),
-
-              const SizedBox(height: 12), // Tópico 3
+              const SizedBox(height: 12),
+              // Tópico 3
               // Esqueceu a senha
               InkWell(
                 child: Text(
@@ -117,7 +135,8 @@ class _LoginState extends State<Login> {
                   textAlign: TextAlign.right,
                 ),
               ),
-              const SizedBox(height: 24), // Tópico 3
+              const SizedBox(height: 24),
+              // Tópico 3
               // Botão Entrar Principal
               SizedBox(
                 height: 48,
@@ -137,14 +156,16 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16), // Tópico 3
+              const SizedBox(height: 16),
 
+              // Tópico 3
               const Text(
                 "ou",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
               ),
-              const SizedBox(height: 16), // Tópico 3
+              const SizedBox(height: 16),
+              // Tópico 3
               // Tópico 6: Botão Google com OutlinedButton e altura 48
               SizedBox(
                 height: 48,
@@ -169,7 +190,8 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(height: 12), // Tópico 3
+              const SizedBox(height: 12),
+              // Tópico 3
               // Tópico 6: Botão Facebook com OutlinedButton e altura 48
               SizedBox(
                 height: 48,
@@ -198,7 +220,8 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(height: 54), // Tópico 3
+              const SizedBox(height: 54),
+              // Tópico 3
               // Rodapé Cadastre-se
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
