@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:primeiro_app/utilitarios/tipografia.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Cadastro extends StatefulWidget {
@@ -16,36 +16,33 @@ class _CadastroState extends State<Cadastro> {
   final senhaControlador = TextEditingController();
   final confirmarSenhaControlador = TextEditingController();
 
-  bool isObscureSenha = true;
-  bool isObscureConfirmarSenha = true;
+  bool isSenhaObscure = true;
+  bool isConfirmarSenhaObscure = true;
 
-  void alterarVisibilidadeSenha() {
+  bool carregando = false;
+
+  // ==============================
+  // MOSTRAR / ESCONDER SENHA
+  // ==============================
+
+  void trocarSenhaObscure(bool confirmar) {
     setState(() {
-      isObscureSenha = !isObscureSenha;
+      if (confirmar) {
+        isConfirmarSenhaObscure = !isConfirmarSenhaObscure;
+      } else {
+        isSenhaObscure = !isSenhaObscure;
+      }
     });
   }
 
-  void alterarVisibilidadeConfirmarSenha() {
-    setState(() {
-      isObscureConfirmarSenha = !isObscureConfirmarSenha;
-    });
-  }
-
-  IconData obterIconeSenha() {
-    return isObscureSenha
-        ? Icons.visibility_off
-        : Icons.visibility;
-  }
-
-  IconData obterIconeConfirmarSenha() {
-    return isObscureConfirmarSenha
-        ? Icons.visibility_off
-        : Icons.visibility;
-  }
+  // ==============================
+  // FAZER CADASTRO
+  // ==============================
 
   Future<void> fazerCadastro() async {
-    if (nomeControlador.text.isEmpty ||
-        emailControlador.text.isEmpty ||
+    // Verifica campos vazios
+    if (nomeControlador.text.trim().isEmpty ||
+        emailControlador.text.trim().isEmpty ||
         senhaControlador.text.isEmpty ||
         confirmarSenhaControlador.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -53,59 +50,94 @@ class _CadastroState extends State<Cadastro> {
           content: Text("Preencha todos os campos."),
         ),
       );
+
       return;
     }
 
+    // Verifica se as senhas são iguais
     if (senhaControlador.text != confirmarSenhaControlador.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("As senhas não são iguais."),
         ),
       );
+
       return;
     }
 
+    // Evita vários cliques
+    if (carregando) {
+      return;
+    }
+
+    setState(() {
+      carregando = true;
+    });
+
     try {
-      var url = Uri.http(
+      final url = Uri.http(
         "10.112.4.33",
-        "api/cadastro",
+        "/api/cadastro",
       );
 
-      var resposta = await http.post(
+      final resposta = await http.post(
         url,
         headers: {
           "Content-Type": "application/json",
         },
         body: jsonEncode({
-          "nome": nomeControlador.text,
-          "email": emailControlador.text,
+          "nome": nomeControlador.text.trim(),
+          "email": emailControlador.text.trim(),
           "senha": senhaControlador.text,
         }),
       );
 
-      print("Status: ${resposta.statusCode}");
-      print("Resposta: ${resposta.body}");
+      Map<String, dynamic> dados = {};
 
-      if (resposta.statusCode >= 200 &&
-          resposta.statusCode < 300) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Cadastro realizado com sucesso!"),
-          ),
-        );
+      try {
+        dados = jsonDecode(resposta.body);
+      } catch (_) {
+        dados = {};
+      }
 
-        Navigator.pop(context);
-      } else {
+      if (!mounted) return;
+
+      // ==============================
+      // ERRO NO CADASTRO
+      // ==============================
+
+      if (resposta.statusCode != 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Erro ao cadastrar: ${resposta.body}",
+              dados["message"] ??
+                  "Não foi possível realizar o cadastro.",
             ),
           ),
         );
+
+        setState(() {
+          carregando = false;
+        });
+
+        return;
       }
+
+      // ==============================
+      // CADASTRO REALIZADO
+      // ==============================
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Cadastro realizado com sucesso!",
+          ),
+        ),
+      );
+
+      Navigator.pop(context);
     } catch (e) {
-      print("Erro: $e");
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -114,8 +146,16 @@ class _CadastroState extends State<Cadastro> {
           ),
         ),
       );
+
+      setState(() {
+        carregando = false;
+      });
     }
   }
+
+  // ==============================
+  // DISPOSE
+  // ==============================
 
   @override
   void dispose() {
@@ -126,6 +166,10 @@ class _CadastroState extends State<Cadastro> {
 
     super.dispose();
   }
+
+  // ==============================
+  // TELA
+  // ==============================
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +183,10 @@ class _CadastroState extends State<Cadastro> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // ==============================
+              // BOTÃO VOLTAR
+              // ==============================
+
               Align(
                 alignment: Alignment.centerLeft,
                 child: GestureDetector(
@@ -155,6 +203,10 @@ class _CadastroState extends State<Cadastro> {
 
               const SizedBox(height: 32),
 
+              // ==============================
+              // TÍTULO
+              // ==============================
+
               Text(
                 "Cadastrar-se",
                 style: Tipografia.h1,
@@ -169,11 +221,17 @@ class _CadastroState extends State<Cadastro> {
 
               const SizedBox(height: 32),
 
+              // ==============================
+              // NOME
+              // ==============================
+
               const Text("Nome"),
+
               const SizedBox(height: 4),
 
               TextField(
                 controller: nomeControlador,
+                textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
                   hintText: "Seu nome",
                   border: OutlineInputBorder(
@@ -188,7 +246,12 @@ class _CadastroState extends State<Cadastro> {
 
               const SizedBox(height: 20),
 
+              // ==============================
+              // EMAIL
+              // ==============================
+
               const Text("Email"),
+
               const SizedBox(height: 4),
 
               TextField(
@@ -208,20 +271,31 @@ class _CadastroState extends State<Cadastro> {
 
               const SizedBox(height: 19),
 
+              // ==============================
+              // SENHA
+              // ==============================
+
               const Text("Senha"),
+
               const SizedBox(height: 4),
 
               TextField(
                 controller: senhaControlador,
-                obscureText: isObscureSenha,
+                obscureText: isSenhaObscure,
                 decoration: InputDecoration(
                   hintText: "••••••••",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   suffixIcon: IconButton(
-                    icon: Icon(obterIconeSenha()),
-                    onPressed: alterarVisibilidadeSenha,
+                    onPressed: () {
+                      trocarSenhaObscure(false);
+                    },
+                    icon: Icon(
+                      isSenhaObscure
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -232,20 +306,31 @@ class _CadastroState extends State<Cadastro> {
 
               const SizedBox(height: 20),
 
+              // ==============================
+              // CONFIRMAR SENHA
+              // ==============================
+
               const Text("Confirmar Senha"),
+
               const SizedBox(height: 4),
 
               TextField(
                 controller: confirmarSenhaControlador,
-                obscureText: isObscureConfirmarSenha,
+                obscureText: isConfirmarSenhaObscure,
                 decoration: InputDecoration(
                   hintText: "••••••••",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   suffixIcon: IconButton(
-                    icon: Icon(obterIconeConfirmarSenha()),
-                    onPressed: alterarVisibilidadeConfirmarSenha,
+                    onPressed: () {
+                      trocarSenhaObscure(true);
+                    },
+                    icon: Icon(
+                      isConfirmarSenhaObscure
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -256,15 +341,19 @@ class _CadastroState extends State<Cadastro> {
 
               const SizedBox(height: 30),
 
-              const SizedBox(height: 24),
+              // ==============================
+              // BOTÃO REGISTRAR
+              // ==============================
 
               SizedBox(
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: fazerCadastro,
+                  onPressed: carregando ? null : fazerCadastro,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
+                    disabledBackgroundColor: Colors.blue.shade200,
+                    disabledForegroundColor: Colors.white,
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(10.0),
@@ -272,7 +361,16 @@ class _CadastroState extends State<Cadastro> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
+                  child: carregando
+                      ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
+                      : const Text(
                     "Registrar",
                     style: TextStyle(
                       fontSize: 16,
@@ -282,8 +380,6 @@ class _CadastroState extends State<Cadastro> {
                 ),
               ),
 
-              const SizedBox(height: 16),
-              const SizedBox(height: 16),
               const SizedBox(height: 54),
             ],
           ),
