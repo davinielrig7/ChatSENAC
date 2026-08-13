@@ -76,7 +76,7 @@ class _CadastroState extends State<Cadastro> {
 
     try {
       final url = Uri.http(
-        "10.112.4.33",
+        "10.112.4.154",
         "/api/cadastro",
       );
 

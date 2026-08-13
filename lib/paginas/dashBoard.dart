@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 class Dashboard extends StatelessWidget {
-  const Dashboard({super.key});
+  final String nomeUsuario;
+
+  const Dashboard({
+    super.key,
+    required this.nomeUsuario,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('chatSenac'),
-        centerTitle: true,
+        title: const Text("ChatSENAC"),
       ),
-      body: const Center(
+      body: Center(
         child: Text(
-          'Dashboard',
-          style: TextStyle(fontSize: 24),
+          "Bem-vindo, $nomeUsuario!",
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );

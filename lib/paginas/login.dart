@@ -1,9 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:primeiro_app/paginas/cadastro.dart';
-import 'package:primeiro_app/paginas/dashBoard.dart';
+import 'package:primeiro_app/paginas/dashboard.dart';
 import 'package:primeiro_app/utilitarios/tipografia.dart';
 
 class Login extends StatefulWidget {
@@ -17,41 +16,60 @@ class _LoginState extends State<Login> {
   final emailControlador = TextEditingController();
   final senhaControlador = TextEditingController();
 
-  Future<void> fazerLogin() async {
-    var url = Uri.http("10.112.4.33", "api/login");
+  Icon getSenhaInvisivel() {
+    if (isObscure) {
+      return const Icon(Icons.visibility_off);
+    }
+
+    return const Icon(Icons.visibility);
+  }
+
+  bool isObscure = true;
+
+  void trocarObscure() {
+    setState(() {
+      isObscure = !isObscure;
+    });
+  }
+
+  Future fazerLogin() async {
+    var url = Uri.http("10.112.4.154", "api/login");
+
     var resposta = await http.post(
       url,
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: jsonEncode({
-        'email': emailControlador.text,
-        'senha': senhaControlador.text,
+        "email": emailControlador.text,
+        "senha": senhaControlador.text,
       }),
     );
 
     if (resposta.statusCode != 200) {
       var dados = jsonDecode(resposta.body);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("${dados['message']}")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("${dados["message"]}"),
+        ),
+      );
 
       return;
     }
-    Navigator.push(context, MaterialPageRoute(builder: (build) => Dashboard()));
-  }
 
-  bool isObscure = true;
+    var dados = jsonDecode(resposta.body);
 
-  void trocarVisibilidadeSenha() {
-    setState(() {
-      isObscure = !isObscure;
-    });
-  }
+    String nomeUsuario = dados["nomeUsuario"] ?? "Usuário";
 
-  IconData iconeSenha() {
-    return isObscure
-        ? Icons.visibility_off
-        : Icons.visibility;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Dashboard(
+          nomeUsuario: nomeUsuario,
+        ),
+      ),
+    );
   }
 
   @override
@@ -59,38 +77,37 @@ class _LoginState extends State<Login> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          // Tópico 1: Rolagem e margens nas bordas
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo e Nome do App
               Row(
-                children: [
+                children: const [
                   FlutterLogo(size: 18),
-                  const SizedBox(width: 8), // Tópico 3: Espaço horizontal
+                  SizedBox(width: 8),
                   Text("ChatSENAC"),
                 ],
               ),
+
               const SizedBox(height: 32),
-              // Tópico 3
-              // Títulos
+
               Text("Entre na sua conta", style: Tipografia.h1),
+
               const SizedBox(height: 12),
-              // Tópico 3
+
               Text(
                 "Coloque o seu email e senha para logar",
                 style: Tipografia.subtitulo,
               ),
+
               const SizedBox(height: 32),
-              // Tópico 3
-              // Campo de Email
-              Text("Email"),
+
+              const Text("Email"),
+
               const SizedBox(height: 4),
-              // Tópico 3
+
               TextField(
                 controller: emailControlador,
-                // Tópico 4: Estilização do input
                 decoration: InputDecoration(
                   hintText: "exemplo@gmail.com",
                   border: OutlineInputBorder(
@@ -102,11 +119,13 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 16),
-              // Tópico 3
-              // Campo de Senha
-              Text("Senha"),
+
+              const Text("Senha"),
+
               const SizedBox(height: 4),
+
               TextField(
                 controller: senhaControlador,
                 obscureText: isObscure,
@@ -116,8 +135,8 @@ class _LoginState extends State<Login> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   suffixIcon: IconButton(
-                    onPressed: trocarVisibilidadeSenha,
-                    icon: Icon(iconeSenha()),
+                    onPressed: trocarObscure,
+                    icon: getSenhaInvisivel(),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -125,19 +144,20 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 12),
-              // Tópico 3
-              // Esqueceu a senha
+
               InkWell(
+                onTap: () {},
                 child: Text(
                   "Esqueceu a senha?",
                   style: Tipografia.link,
                   textAlign: TextAlign.right,
                 ),
               ),
+
               const SizedBox(height: 24),
-              // Tópico 3
-              // Botão Entrar Principal
+
               SizedBox(
                 height: 48,
                 child: ElevatedButton(
@@ -145,10 +165,10 @@ class _LoginState extends State<Login> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                    ),
                     elevation: 0,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
                   ),
                   child: const Text(
                     "Entrar",
@@ -156,32 +176,26 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 16),
 
-              // Tópico 3
               const Text(
                 "ou",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
               ),
+
               const SizedBox(height: 16),
-              // Tópico 3
-              // Tópico 6: Botão Google com OutlinedButton e altura 48
+
               SizedBox(
                 height: 48,
                 child: OutlinedButton(
                   onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                    ),
-                    side: const BorderSide(color: Colors.grey),
-                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 10,
                     children: [
                       Image.asset("assets/imagens/google-icon.png", height: 18),
+                      const SizedBox(width: 10),
                       Text(
                         "Continuar com o Google",
                         style: Tipografia.subtitulo,
@@ -190,51 +204,43 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 12),
-              // Tópico 3
-              // Tópico 6: Botão Facebook com OutlinedButton e altura 48
+
               SizedBox(
                 height: 48,
                 child: OutlinedButton(
                   onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                    ),
-                    side: const BorderSide(color: Colors.grey),
-                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 10,
                     children: [
                       Image.asset(
                         "assets/imagens/facebook-icon.png",
                         height: 18,
                       ),
+                      const SizedBox(width: 10),
                       Text(
                         "Continuar com o Facebook",
                         style: Tipografia.subtitulo,
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 ),
               ),
+
               const SizedBox(height: 54),
-              // Tópico 3
-              // Rodapé Cadastre-se
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Não tem uma conta? "),
+                  const Text("Não tem uma conta? "),
                   InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (build) => Cadastro()),
+                        MaterialPageRoute(builder: (_) => Cadastro()),
                       );
                     },
-                    // TÓPICO 7 APLICADO AQUI: Correção ortográfica de "Cdastre-se" para "Cadastre-se"
                     child: Text("Cadastre-se", style: Tipografia.link),
                   ),
                 ],
