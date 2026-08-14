@@ -40,6 +40,8 @@ class _CadastroState extends State<Cadastro> {
   // ==============================
 
   Future<void> fazerCadastro() async {
+    const baseUrl = String.fromEnvironment("/API/URL");
+
     // Verifica campos vazios
     if (nomeControlador.text.trim().isEmpty ||
         emailControlador.text.trim().isEmpty ||
@@ -76,7 +78,7 @@ class _CadastroState extends State<Cadastro> {
 
     try {
       final url = Uri.http(
-        "10.112.4.154",
+        baseUrl,
         "/api/cadastro",
       );
 
